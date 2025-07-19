@@ -9,7 +9,7 @@ import uvicorn
 
 app = FastAPI(
     title="Ecommerce API",
-    description="FastAPI backend for ecommerce application with MongoDB",
+    description="FastAPI backend for ecommerce application with MongoDB. All prices are in Indian Rupees (₹).",
     version="1.0.0"
 )
 

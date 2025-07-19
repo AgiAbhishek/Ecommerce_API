@@ -2,11 +2,12 @@
 
 ## Overview
 
-This is a FastAPI-based ecommerce backend application that provides REST APIs for managing products and orders. The system uses MongoDB as the primary database and follows a modular architecture with separate routing, models, and utility components.
+This is a FastAPI-based ecommerce backend application that provides REST APIs for managing products and orders. The system uses MongoDB as the primary database and follows a modular architecture with separate routing, models, and utility components. All monetary values are displayed in Indian Rupees (₹).
 
 ## User Preferences
 
 Preferred communication style: Simple, everyday language.
+Currency display: Indian Rupees (₹) instead of dollars ($).
 
 ## System Architecture
 
