@@ -95,6 +95,20 @@
             border-radius: 4px;
             margin-top: 15px;
         }
+        .size-input, .item-input {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 10px;
+            align-items: center;
+        }
+        .size-input input, .item-input input, .item-input select {
+            flex: 1;
+        }
+        .size-input button, .item-input button {
+            background-color: #dc3545;
+            padding: 5px 10px;
+            font-size: 12px;
+        }
     </style>
 </head>
 <body>
@@ -117,8 +131,15 @@
                     <input type="number" id="productPrice" name="price" step="0.01" required>
                 </div>
                 <div class="form-group">
-                    <label for="productSizes">Sizes (JSON format):</label>
-                    <textarea id="productSizes" name="sizes" rows="3" placeholder='[{"size": "large", "quantity": 10}, {"size": "medium", "quantity": 5}]' required></textarea>
+                    <label>Product Sizes:</label>
+                    <div id="sizesContainer">
+                        <div class="size-input">
+                            <input type="text" placeholder="Size (e.g., Large, Medium, XL)" class="size-name" required>
+                            <input type="number" placeholder="Quantity" class="size-quantity" min="0" required>
+                            <button type="button" onclick="removeSizeInput(this)">Remove</button>
+                        </div>
+                    </div>
+                    <button type="button" onclick="addSizeInput()">Add Another Size</button>
                 </div>
                 <button type="submit">Create Product</button>
             </form>
@@ -164,8 +185,17 @@
                     <input type="text" id="userId" name="userId" value="user_1" required>
                 </div>
                 <div class="form-group">
-                    <label for="orderItems">Order Items (JSON format):</label>
-                    <textarea id="orderItems" name="items" rows="4" placeholder='[{"productId": "product-id-here", "qty": 2}]' required></textarea>
+                    <label>Order Items:</label>
+                    <div id="itemsContainer">
+                        <div class="item-input">
+                            <select class="product-select" required>
+                                <option value="">Select Product</option>
+                            </select>
+                            <input type="number" placeholder="Quantity" class="item-quantity" min="1" required>
+                            <button type="button" onclick="removeItemInput(this)">Remove</button>
+                        </div>
+                    </div>
+                    <button type="button" onclick="addItemInput()">Add Another Item</button>
                 </div>
                 <button type="submit">Create Order</button>
             </form>
@@ -247,34 +277,112 @@
             element.textContent = JSON.stringify(response.data, null, 2);
         }
 
+        // Helper functions for dynamic form inputs
+        function addSizeInput() {
+            const container = document.getElementById('sizesContainer');
+            const div = document.createElement('div');
+            div.className = 'size-input';
+            div.innerHTML = `
+                <input type="text" placeholder="Size (e.g., Large, Medium, XL)" class="size-name" required>
+                <input type="number" placeholder="Quantity" class="size-quantity" min="0" required>
+                <button type="button" onclick="removeSizeInput(this)">Remove</button>
+            `;
+            container.appendChild(div);
+        }
+
+        function removeSizeInput(button) {
+            const container = document.getElementById('sizesContainer');
+            if (container.children.length > 1) {
+                button.parentElement.remove();
+            }
+        }
+
+        function addItemInput() {
+            const container = document.getElementById('itemsContainer');
+            const div = document.createElement('div');
+            div.className = 'item-input';
+            div.innerHTML = `
+                <select class="product-select" required>
+                    <option value="">Select Product</option>
+                </select>
+                <input type="number" placeholder="Quantity" class="item-quantity" min="1" required>
+                <button type="button" onclick="removeItemInput(this)">Remove</button>
+            `;
+            container.appendChild(div);
+            updateProductSelects();
+        }
+
+        function removeItemInput(button) {
+            const container = document.getElementById('itemsContainer');
+            if (container.children.length > 1) {
+                button.parentElement.remove();
+            }
+        }
+
+        // Update product dropdowns
+        async function updateProductSelects() {
+            const response = await makeRequest('/products?limit=100');
+            if (response.ok && response.data.data) {
+                const products = response.data.data;
+                const selects = document.querySelectorAll('.product-select');
+                
+                selects.forEach(select => {
+                    const currentValue = select.value;
+                    select.innerHTML = '<option value="">Select Product</option>';
+                    
+                    products.forEach(product => {
+                        const option = document.createElement('option');
+                        option.value = product.id;
+                        option.textContent = `${product.name} - $${product.price}`;
+                        select.appendChild(option);
+                    });
+                    
+                    if (currentValue) select.value = currentValue;
+                });
+            }
+        }
+
         // Create Product
         document.getElementById('createProductForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             const formData = new FormData(e.target);
             
-            try {
-                const sizes = JSON.parse(formData.get('sizes'));
-                const productData = {
-                    name: formData.get('name'),
-                    price: parseFloat(formData.get('price')),
-                    sizes: sizes
-                };
-
-                const response = await makeRequest('/products', {
-                    method: 'POST',
-                    body: JSON.stringify(productData)
-                });
-
-                displayResponse('createProductResponse', response);
-                if (response.ok) {
-                    e.target.reset();
-                    refreshData();
+            // Collect sizes from form inputs
+            const sizeInputs = document.querySelectorAll('.size-input');
+            const sizes = [];
+            
+            sizeInputs.forEach(input => {
+                const sizeName = input.querySelector('.size-name').value;
+                const sizeQuantity = parseInt(input.querySelector('.size-quantity').value);
+                if (sizeName && sizeQuantity >= 0) {
+                    sizes.push({ size: sizeName, quantity: sizeQuantity });
                 }
-            } catch (error) {
-                displayResponse('createProductResponse', {
-                    ok: false,
-                    data: { error: 'Invalid JSON in sizes field' }
-                });
+            });
+
+            const productData = {
+                name: formData.get('name'),
+                price: parseFloat(formData.get('price')),
+                sizes: sizes
+            };
+
+            const response = await makeRequest('/products', {
+                method: 'POST',
+                body: JSON.stringify(productData)
+            });
+
+            displayResponse('createProductResponse', response);
+            if (response.ok) {
+                e.target.reset();
+                // Reset sizes to one empty input
+                document.getElementById('sizesContainer').innerHTML = `
+                    <div class="size-input">
+                        <input type="text" placeholder="Size (e.g., Large, Medium, XL)" class="size-name" required>
+                        <input type="number" placeholder="Quantity" class="size-quantity" min="0" required>
+                        <button type="button" onclick="removeSizeInput(this)">Remove</button>
+                    </div>
+                `;
+                refreshData();
+                updateProductSelects();
             }
         });
 
@@ -298,27 +406,50 @@
             e.preventDefault();
             const formData = new FormData(e.target);
             
-            try {
-                const items = JSON.parse(formData.get('items'));
-                const orderData = {
-                    userId: formData.get('userId'),
-                    items: items
-                };
-
-                const response = await makeRequest('/orders', {
-                    method: 'POST',
-                    body: JSON.stringify(orderData)
-                });
-
-                displayResponse('createOrderResponse', response);
-                if (response.ok) {
-                    refreshData();
+            // Collect items from form inputs
+            const itemInputs = document.querySelectorAll('.item-input');
+            const items = [];
+            
+            itemInputs.forEach(input => {
+                const productId = input.querySelector('.product-select').value;
+                const quantity = parseInt(input.querySelector('.item-quantity').value);
+                if (productId && quantity > 0) {
+                    items.push({ productId: productId, qty: quantity });
                 }
-            } catch (error) {
+            });
+
+            if (items.length === 0) {
                 displayResponse('createOrderResponse', {
                     ok: false,
-                    data: { error: 'Invalid JSON in items field' }
+                    data: { error: 'Please select at least one product' }
                 });
+                return;
+            }
+
+            const orderData = {
+                userId: formData.get('userId'),
+                items: items
+            };
+
+            const response = await makeRequest('/orders', {
+                method: 'POST',
+                body: JSON.stringify(orderData)
+            });
+
+            displayResponse('createOrderResponse', response);
+            if (response.ok) {
+                // Reset order form
+                document.getElementById('itemsContainer').innerHTML = `
+                    <div class="item-input">
+                        <select class="product-select" required>
+                            <option value="">Select Product</option>
+                        </select>
+                        <input type="number" placeholder="Quantity" class="item-quantity" min="1" required>
+                        <button type="button" onclick="removeItemInput(this)">Remove</button>
+                    </div>
+                `;
+                updateProductSelects();
+                refreshData();
             }
         });
 
@@ -351,6 +482,7 @@
 
         // Load initial data
         refreshData();
+        updateProductSelects();
     </script>
 </body>
 </html>
