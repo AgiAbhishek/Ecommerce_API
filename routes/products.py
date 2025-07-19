@@ -7,7 +7,7 @@ import re
 
 router = APIRouter()
 
-@router.post("/", response_model=ProductCreateResponse, status_code=201)
+@router.post("", response_model=ProductCreateResponse, status_code=201)
 async def create_product(product: ProductCreate):
     """Create a new product"""
     try:
@@ -22,7 +22,7 @@ async def create_product(product: ProductCreate):
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error creating product: {str(e)}")
 
-@router.get("/", response_model=ProductListResponse)
+@router.get("", response_model=ProductListResponse)
 async def list_products(
     name: Optional[str] = Query(None, description="Filter by product name (supports regex)"),
     size: Optional[str] = Query(None, description="Filter by size availability"),

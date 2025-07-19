@@ -17,7 +17,10 @@ class InMemoryDatabase:
         elif collection == "orders":
             self.orders.append(document)
         
-        return {"inserted_id": doc_id}
+        class InsertResult:
+            def __init__(self, doc_id):
+                self.inserted_id = doc_id
+        return InsertResult(doc_id)
 
     async def find_one(self, collection: str, query: Dict[str, Any]) -> Optional[Dict[str, Any]]:
         """Find a single document"""
@@ -79,10 +82,11 @@ class DatabaseCollection:
     async def find_one(self, query: Dict[str, Any]):
         return await db_instance.find_one(self.collection_name, query)
 
-    async def find(self, query: Dict[str, Any] = None):
+    def find(self, query: Dict[str, Any] = None):
         class Cursor:
-            def __init__(self, data):
-                self.data = data
+            def __init__(self, collection_name, query):
+                self.collection_name = collection_name
+                self.query = query
                 self._skip = 0
                 self._limit = None
                 self._sort = None
@@ -100,7 +104,8 @@ class DatabaseCollection:
                 return self
 
             async def to_list(self, length):
-                data = self.data
+                results = await db_instance.find(self.collection_name, self.query)
+                data = results
                 if self._sort:
                     field, direction = self._sort
                     data = sorted(data, key=lambda x: x.get(field, ""), reverse=(direction == -1))
@@ -111,8 +116,7 @@ class DatabaseCollection:
                 
                 return data
 
-        results = await db_instance.find(self.collection_name, query)
-        return Cursor(results)
+        return Cursor(self.collection_name, query)
 
     async def count_documents(self, query: Dict[str, Any] = None):
         return await db_instance.count_documents(self.collection_name, query)

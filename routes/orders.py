@@ -7,7 +7,7 @@ from datetime import datetime
 
 router = APIRouter()
 
-@router.post("/", response_model=OrderCreateResponse, status_code=201)
+@router.post("", response_model=OrderCreateResponse, status_code=201)
 async def create_order(order: OrderCreate):
     """Create a new order"""
     try:
@@ -61,7 +61,7 @@ async def get_user_orders(
         db = get_database()
         
         # Get all orders for the user
-        all_orders = await db.orders.find({"userId": user_id})
+        all_orders = db.orders.find({"userId": user_id})
         orders_data = await all_orders.to_list(length=None)
         
         # Sort by _id (creation order)
