@@ -2,6 +2,14 @@
 
 A comprehensive FastAPI-based ecommerce backend application with MongoDB Atlas integration, featuring product management and order processing capabilities. All monetary values are displayed in Indian Rupees (₹).
 
+## 🚀 Live Demo
+
+**Deployed Application**: https://ecommerceapi-production-4de4.up.railway.app/
+
+- **Web Interface**: https://ecommerceapi-production-4de4.up.railway.app/
+- **API Documentation**: https://ecommerceapi-production-4de4.up.railway.app/docs  
+- **Health Check**: https://ecommerceapi-production-4de4.up.railway.app/health
+
 ## Features
 
 - **Product Management**: Create, list, and filter products with size variants
