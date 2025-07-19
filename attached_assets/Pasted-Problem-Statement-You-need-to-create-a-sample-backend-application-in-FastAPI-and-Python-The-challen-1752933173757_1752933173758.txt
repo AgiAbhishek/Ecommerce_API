@@ -1,0 +1,116 @@
+Problem Statement
+You need to create a sample backend application in FastAPI and Python. The challenge assumes you have basic knowledge of Python and some knowledge of Flask / Django / FastAPI. You have to learn the basics of FastAPI and build an application with the APIs, and save the data in MongoDB.
+Brief
+You are building an ecommerce application like Flipkart/Amazon. You need to build the following APIs -
+Create Products API
+Endpoint - /products
+Method - POST
+Request Body - 
+{
+    "name": "string",
+    "price": 100.0,
+    "sizes": [
+        {
+            "size": "string",
+            "quantity": 0
+        }
+    ]
+}
+
+Response Body - 
+{
+    "id": "1234567890"
+}
+Return Status Code - 201 (CREATED)
+List Products API
+Endpoint - /products
+Method - GET
+Query Parameters (all optional) to filter / search on the listing -
+* Name (can include regex / partial search)
+* size =large → Should be able to filter, for those products which have a size=large.
+* limit → number of documents to return
+* offset → The number of documents to skip while paginating (sorted by _id)
+Response Body -
+{
+    "id": "12345",
+    "name": "Sample",
+    "price": 100.0
+    # No sizes in output
+},
+{
+    "id": "12346",
+    "name": "Sample 2",
+    "price": 10.0
+},
+    # ...
+},
+"page": { # for pagination
+    "next": "10", # next page starting index
+    "limit": 0, # number of records in current page
+    "previous": -10  # previous page starting index
+}
+
+Return Status Code - 200 (OK)
+
+Create Order API
+Endpoint - /orders
+Method - POST
+Request Body - 
+{
+    "userId": "user_1",  # can be hardcoded
+    "items": [
+        {
+            "productId": "123456789",  # ID of product selected by user, str format
+            "qty": 3
+        },
+        {
+            "productId": "222222",
+            "qty": 3
+        }
+    ]
+}
+Response Body:
+{
+    "id": "1234567890"
+}
+Get List of Orders
+Endpoint - /orders/<user_id> → URL Parameter
+Method - GET
+Query Parameters (all optional) to filter / search on the listing -
+* limit → number of documents to return
+* offset → The number of documents to skip while paginating (sorted by _id)
+Response Body -
+{
+    "data": [
+        {
+            "id": "12345",  # Order ID
+            "items": [
+                {
+                    "productDetails": {  # Joined product details from lookup
+                        "name": "Sample Product",
+                        "id": "123456"
+                    },
+                    "qty": 3
+                },
+                {
+                    "productDetails": {
+                        "name": "Sample Product",
+                        "id": "123456"
+                    },
+                    "qty": 3
+                }
+            ],
+            "total": 250.0
+        },
+        # ... more records
+    ],
+    "page": {  # Pagination metadata
+        "next": "10",      # Next page starting index
+        "limit": 0,        # Number of records in current page
+        "previous": -10    # Previous page starting index
+    }
+}
+Tech Stack Requirements:
+* Language: Python 3 (3.10/3.11/3.12/3.13)
+* Framework: FastAPI (Mandatory)
+* Database: MongoDB (using MongoDB Atlas M0 free cluster)
