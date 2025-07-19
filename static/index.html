@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ecommerce API Test Interface</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+        }
+        h2 {
+            color: #0066cc;
+            border-bottom: 2px solid #0066cc;
+            padding-bottom: 5px;
+        }
+        .endpoint {
+            background: #f8f9fa;
+            padding: 15px;
+            margin: 15px 0;
+            border-left: 4px solid #0066cc;
+            border-radius: 4px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input, textarea, select {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        button {
+            background-color: #0066cc;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-right: 10px;
+        }
+        button:hover {
+            background-color: #0052a3;
+        }
+        .response {
+            background: #f8f9fa;
+            border: 1px solid #ddd;
+            padding: 10px;
+            margin-top: 10px;
+            border-radius: 4px;
+            white-space: pre-wrap;
+            font-family: monospace;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        .success {
+            border-left: 4px solid #28a745;
+        }
+        .error {
+            border-left: 4px solid #dc3545;
+        }
+        .method {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 3px;
+            color: white;
+            font-size: 12px;
+            font-weight: bold;
+        }
+        .post { background-color: #28a745; }
+        .get { background-color: #007bff; }
+        .data-display {
+            background: #e9ecef;
+            padding: 15px;
+            border-radius: 4px;
+            margin-top: 15px;
+        }
+    </style>
+</head>
+<body>
+    <h1>🛒 Ecommerce API Test Interface</h1>
+    
+    <!-- Products Section -->
+    <div class="container">
+        <h2>📦 Products Management</h2>
+        
+        <!-- Create Product -->
+        <div class="endpoint">
+            <h3><span class="method post">POST</span> /products - Create Product</h3>
+            <form id="createProductForm">
+                <div class="form-group">
+                    <label for="productName">Product Name:</label>
+                    <input type="text" id="productName" name="name" required>
+                </div>
+                <div class="form-group">
+                    <label for="productPrice">Price:</label>
+                    <input type="number" id="productPrice" name="price" step="0.01" required>
+                </div>
+                <div class="form-group">
+                    <label for="productSizes">Sizes (JSON format):</label>
+                    <textarea id="productSizes" name="sizes" rows="3" placeholder='[{"size": "large", "quantity": 10}, {"size": "medium", "quantity": 5}]' required></textarea>
+                </div>
+                <button type="submit">Create Product</button>
+            </form>
+            <div id="createProductResponse" class="response" style="display:none;"></div>
+        </div>
+
+        <!-- List Products -->
+        <div class="endpoint">
+            <h3><span class="method get">GET</span> /products - List Products</h3>
+            <form id="listProductsForm">
+                <div class="form-group">
+                    <label for="filterName">Filter by Name:</label>
+                    <input type="text" id="filterName" name="name" placeholder="Optional - partial name search">
+                </div>
+                <div class="form-group">
+                    <label for="filterSize">Filter by Size:</label>
+                    <input type="text" id="filterSize" name="size" placeholder="Optional - e.g., large, medium">
+                </div>
+                <div class="form-group">
+                    <label for="limitProducts">Limit:</label>
+                    <input type="number" id="limitProducts" name="limit" value="10" min="1" max="100">
+                </div>
+                <div class="form-group">
+                    <label for="offsetProducts">Offset:</label>
+                    <input type="number" id="offsetProducts" name="offset" value="0" min="0">
+                </div>
+                <button type="submit">List Products</button>
+            </form>
+            <div id="listProductsResponse" class="response" style="display:none;"></div>
+        </div>
+    </div>
+
+    <!-- Orders Section -->
+    <div class="container">
+        <h2>🛍️ Orders Management</h2>
+        
+        <!-- Create Order -->
+        <div class="endpoint">
+            <h3><span class="method post">POST</span> /orders - Create Order</h3>
+            <form id="createOrderForm">
+                <div class="form-group">
+                    <label for="userId">User ID:</label>
+                    <input type="text" id="userId" name="userId" value="user_1" required>
+                </div>
+                <div class="form-group">
+                    <label for="orderItems">Order Items (JSON format):</label>
+                    <textarea id="orderItems" name="items" rows="4" placeholder='[{"productId": "product-id-here", "qty": 2}]' required></textarea>
+                </div>
+                <button type="submit">Create Order</button>
+            </form>
+            <div id="createOrderResponse" class="response" style="display:none;"></div>
+        </div>
+
+        <!-- Get Orders -->
+        <div class="endpoint">
+            <h3><span class="method get">GET</span> /orders/{user_id} - Get User Orders</h3>
+            <form id="getOrdersForm">
+                <div class="form-group">
+                    <label for="getUserId">User ID:</label>
+                    <input type="text" id="getUserId" name="userId" value="user_1" required>
+                </div>
+                <div class="form-group">
+                    <label for="limitOrders">Limit:</label>
+                    <input type="number" id="limitOrders" name="limit" value="10" min="1" max="100">
+                </div>
+                <div class="form-group">
+                    <label for="offsetOrders">Offset:</label>
+                    <input type="number" id="offsetOrders" name="offset" value="0" min="0">
+                </div>
+                <button type="submit">Get Orders</button>
+            </form>
+            <div id="getOrdersResponse" class="response" style="display:none;"></div>
+        </div>
+    </div>
+
+    <!-- Current Data Display -->
+    <div class="container">
+        <h2>📊 Current Data</h2>
+        <button onclick="refreshData()">Refresh Data</button>
+        
+        <div class="data-display">
+            <h3>Products in Database:</h3>
+            <div id="currentProducts" class="response"></div>
+        </div>
+        
+        <div class="data-display">
+            <h3>Orders in Database:</h3>
+            <div id="currentOrders" class="response"></div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = '';
+
+        // Helper function to make API requests
+        async function makeRequest(url, options = {}) {
+            try {
+                const response = await fetch(url, {
+                    headers: {
+                        'Content-Type': 'application/json',
+                        ...options.headers
+                    },
+                    ...options
+                });
+                
+                const data = await response.json();
+                return {
+                    ok: response.ok,
+                    status: response.status,
+                    data: data
+                };
+            } catch (error) {
+                return {
+                    ok: false,
+                    status: 0,
+                    data: { error: error.message }
+                };
+            }
+        }
+
+        // Display response in the UI
+        function displayResponse(elementId, response) {
+            const element = document.getElementById(elementId);
+            element.style.display = 'block';
+            element.className = `response ${response.ok ? 'success' : 'error'}`;
+            element.textContent = JSON.stringify(response.data, null, 2);
+        }
+
+        // Create Product
+        document.getElementById('createProductForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            
+            try {
+                const sizes = JSON.parse(formData.get('sizes'));
+                const productData = {
+                    name: formData.get('name'),
+                    price: parseFloat(formData.get('price')),
+                    sizes: sizes
+                };
+
+                const response = await makeRequest('/products', {
+                    method: 'POST',
+                    body: JSON.stringify(productData)
+                });
+
+                displayResponse('createProductResponse', response);
+                if (response.ok) {
+                    e.target.reset();
+                    refreshData();
+                }
+            } catch (error) {
+                displayResponse('createProductResponse', {
+                    ok: false,
+                    data: { error: 'Invalid JSON in sizes field' }
+                });
+            }
+        });
+
+        // List Products
+        document.getElementById('listProductsForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            
+            const params = new URLSearchParams();
+            if (formData.get('name')) params.append('name', formData.get('name'));
+            if (formData.get('size')) params.append('size', formData.get('size'));
+            params.append('limit', formData.get('limit'));
+            params.append('offset', formData.get('offset'));
+
+            const response = await makeRequest(`/products?${params}`);
+            displayResponse('listProductsResponse', response);
+        });
+
+        // Create Order
+        document.getElementById('createOrderForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            
+            try {
+                const items = JSON.parse(formData.get('items'));
+                const orderData = {
+                    userId: formData.get('userId'),
+                    items: items
+                };
+
+                const response = await makeRequest('/orders', {
+                    method: 'POST',
+                    body: JSON.stringify(orderData)
+                });
+
+                displayResponse('createOrderResponse', response);
+                if (response.ok) {
+                    refreshData();
+                }
+            } catch (error) {
+                displayResponse('createOrderResponse', {
+                    ok: false,
+                    data: { error: 'Invalid JSON in items field' }
+                });
+            }
+        });
+
+        // Get Orders
+        document.getElementById('getOrdersForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            
+            const userId = formData.get('userId');
+            const params = new URLSearchParams();
+            params.append('limit', formData.get('limit'));
+            params.append('offset', formData.get('offset'));
+
+            const response = await makeRequest(`/orders/${userId}?${params}`);
+            displayResponse('getOrdersResponse', response);
+        });
+
+        // Refresh current data
+        async function refreshData() {
+            // Get all products
+            const productsResponse = await makeRequest('/products?limit=100');
+            document.getElementById('currentProducts').textContent = 
+                JSON.stringify(productsResponse.data, null, 2);
+
+            // Get all orders for user_1
+            const ordersResponse = await makeRequest('/orders/user_1?limit=100');
+            document.getElementById('currentOrders').textContent = 
+                JSON.stringify(ordersResponse.data, null, 2);
+        }
+
+        // Load initial data
+        refreshData();
+    </script>
+</body>
+</html>

@@ -1,5 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
 from routes.products import router as products_router
 from routes.orders import router as orders_router
 from database import connect_to_mongodb
@@ -20,6 +22,9 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# Mount static files
+app.mount("/static", StaticFiles(directory="static"), name="static")
+
 # Include routers
 app.include_router(products_router, prefix="/products", tags=["products"])
 app.include_router(orders_router, prefix="/orders", tags=["orders"])
@@ -31,7 +36,8 @@ async def startup_event():
 
 @app.get("/")
 async def root():
-    return {"message": "Ecommerce API is running"}
+    """Serve the main interface"""
+    return FileResponse('static/index.html')
 
 @app.get("/health")
 async def health_check():
