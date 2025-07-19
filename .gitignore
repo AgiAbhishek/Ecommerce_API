@@ -1,0 +1,42 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environment
+venv/
+env/
+ENV/
+.venv/
+env.bak/
+
+# VSCode settings
+.vscode/
+.history/
+
+# Environment variables
+.env
+
+# Pytest cache
+.pytest_cache/
+
+# MyPy, Pylint, Bandit, etc.
+.mypy_cache/
+.pylint.d/
+.bandit/
+
+# Local development logs
+*.log
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Lock files
+poetry.lock
+Pipfile.lock
+uv.lock
+
+# Static and media folders (optional)
+staticfiles/
+media/

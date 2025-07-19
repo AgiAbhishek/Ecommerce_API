@@ -1,3 +1,5 @@
+from dotenv import load_dotenv
+load_dotenv()
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
@@ -5,6 +7,10 @@ from fastapi.responses import FileResponse
 from routes.products import router as products_router
 from routes.orders import router as orders_router
 from database import connect_to_mongodb
+# Add to main.py, routes files
+import sys
+import os
+sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 import uvicorn
 
 app = FastAPI(
