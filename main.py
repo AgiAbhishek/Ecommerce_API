@@ -40,10 +40,10 @@ async def startup_event():
     """Connect to MongoDB on startup"""
     await connect_to_mongodb()
 
-#@app.get("/")
-#async def root():
-    #"""Serve the main interface"""
-    #return FileResponse('static/index.html')
+@app.get("/")
+async def root():
+    """Serve the main interface"""
+    return FileResponse('static/index.html')
 
 @app.get("/health")
 async def health_check():
