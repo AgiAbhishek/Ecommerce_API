@@ -95,6 +95,17 @@
             border-radius: 4px;
             margin-top: 15px;
         }
+        .data-display .response {
+            min-height: 100px;
+            background: white;
+            border: 1px solid #ddd;
+            padding: 10px;
+            margin-top: 10px;
+            border-radius: 4px;
+            white-space: pre-wrap;
+            font-family: monospace;
+            font-size: 12px;
+        }
         .size-input, .item-input {
             display: flex;
             gap: 10px;
@@ -469,15 +480,37 @@
 
         // Refresh current data
         async function refreshData() {
-            // Get all products
-            const productsResponse = await makeRequest('/products?limit=100');
-            document.getElementById('currentProducts').textContent = 
-                JSON.stringify(productsResponse.data, null, 2);
+            try {
+                // Get all products
+                const productsResponse = await makeRequest('/products?limit=100');
+                const productsElement = document.getElementById('currentProducts');
+                
+                if (productsResponse.ok && productsResponse.data) {
+                    productsElement.textContent = JSON.stringify(productsResponse.data, null, 2);
+                    productsElement.className = 'response success';
+                } else {
+                    productsElement.textContent = 'Error loading products: ' + JSON.stringify(productsResponse.data, null, 2);
+                    productsElement.className = 'response error';
+                }
 
-            // Get all orders for user_1
-            const ordersResponse = await makeRequest('/orders/user_1?limit=100');
-            document.getElementById('currentOrders').textContent = 
-                JSON.stringify(ordersResponse.data, null, 2);
+                // Get all orders for user_1
+                const ordersResponse = await makeRequest('/orders/user_1?limit=100');
+                const ordersElement = document.getElementById('currentOrders');
+                
+                if (ordersResponse.ok && ordersResponse.data) {
+                    ordersElement.textContent = JSON.stringify(ordersResponse.data, null, 2);
+                    ordersElement.className = 'response success';
+                } else {
+                    ordersElement.textContent = 'Error loading orders: ' + JSON.stringify(ordersResponse.data, null, 2);
+                    ordersElement.className = 'response error';
+                }
+                
+                console.log('Data refreshed successfully');
+            } catch (error) {
+                console.error('Error refreshing data:', error);
+                document.getElementById('currentProducts').textContent = 'Error: ' + error.message;
+                document.getElementById('currentOrders').textContent = 'Error: ' + error.message;
+            }
         }
 
         // Load initial data
